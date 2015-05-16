@@ -1,2 +1,2 @@
 # v-com
-Viral and circular COntent from Metagenomes (VCOM)
+Viral and circular Content from Metagenomes (V-CoM)
