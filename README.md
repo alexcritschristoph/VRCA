@@ -1,11 +1,9 @@
-# Detecting Viral and Circular Contigs in Metagenomes.
+## Detecting Viral and Circular Contigs in Metagenomes.
 
-A repository of scripts and data used in my research on this.
+`find_circular.py`
 
-##Requirements:
-1. python-numpy
-2. python-sklearn
-3. python-biopython
-4. Prodigal (most recent version)
-5. Lastz
-6. Optional: bowtie (for paired read circular detection mapping)
+A python script that finds circular contigs in metagenome assemblies using two different methods.
+
+Requirements:
+1. Lastz
+2. Bowtie2
