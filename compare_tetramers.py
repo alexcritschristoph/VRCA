@@ -61,11 +61,14 @@ if __name__ == "__main__":
 	records2 = list(SeqIO.parse(handle, "fasta"))
 	handle.close()
 
-	print ""
-	print "Calculating tetranucleotide frequencies for query..."
-	tetramers = calc_tetra(records)
+	print "Calculating tetranucleotide frequencies for subject..."
 	tetramers2 = calc_tetra(records2)
-	#Compare
+
+	for seqs in records:
+		print "Calculating tetranucleotide frequencies for query..."
+		tetramers = calc_tetra([seqs])
+		
+		#Compare
 	
-	print "Comparing query and subject tetranucleotide frequencies..."
-	read_data(tetramers, tetramers2)
+		print "Comparing query and subject tetranucleotide frequencies..."
+		read_data(tetramers, tetramers2)
