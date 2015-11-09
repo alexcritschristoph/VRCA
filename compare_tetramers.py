@@ -3,7 +3,7 @@ from scipy.spatial import distance
 import sys
 from Bio import SeqIO
 
-def calc_tetra(seqs):
+def calc_tetra(seqs_record):
 
 	tetramers = {}
 	for a in ['A', 'C', 'G', 'T']:
@@ -12,7 +12,7 @@ def calc_tetra(seqs):
 				for d in ['A', 'C', 'G', 'T']:
 					tetramers[a+b+c+d] = 0
 
-	for seq in seqs:
+	for seqs in seqs_record:
 		start = 0
 		end = 4	
 		for i in range(0,len(str(seqs.seq))):
@@ -47,7 +47,7 @@ def read_data(tetramers1, tetramers2):
 		subject_dat.append(tetramers2[d])
 
 	
-	print "Calculated euclidean distance: " + str(round(distance.euclidean(query_dat, subject_data),5))
+	print "Calculated euclidean distance: " + str(round(distance.euclidean(query_dat, subject_dat),5))
 
 if __name__ == "__main__":
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 	tetramers2 = calc_tetra(records2)
 
 	for seqs in records:
-		print "Calculating tetranucleotide frequencies for query..."
+		print "Calculating tetranucleotide frequencies for query " + str(seqs.id)
 		tetramers = calc_tetra([seqs])
 		
 		#Compare
