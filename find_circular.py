@@ -45,14 +45,15 @@ def self_align(seqs, read_length):
         for result in results:
             if result != '':
                 start1 = result.split()[0]
+                end1 = result.split()[1]
                 start2 = result.split()[2]
                 end2 = result.split()[3]
                 strand1 = result.split()[5]
                 strand2 = result.split()[6]
                 identity = result.split()[7]
                 length = int(result.split()[9])
-                if strand1 == strand2 and length > 0.5 * read_length and float(fractions.Fraction(identity)) > 0.9:
-                    if int(start1) < 5 and int(end2) > read_length*2 * 0.9: 
+                if strand1 == strand2 and length > 0.4 * read_length and float(fractions.Fraction(identity)) > 0.95:
+                    if int(start1) < 5 and int(start2) > read_length and int(end1) < read_length and int(end2) > read_length*2 * 0.9: 
                         print seq.id
 			print result
 			if seq.id not in positive_self_aligns:
