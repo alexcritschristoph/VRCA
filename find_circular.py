@@ -146,7 +146,7 @@ if __name__ == "__main__":
     __author__ = "Alex Crits-Christoph"
     print sys.argv
 
-    parser = argparse.ArgumentParser(description='This is a demo script by nixCraft.')
+    parser = argparse.ArgumentParser(description='Finds circular contigs using lastz and bowtie.')
     parser.add_argument('-i','--input', help='Input assembly filename',required=True)
     parser.add_argument('-r1','--reads1',help='Paired reads file 1', required=False)
     parser.add_argument('-r2','--reads2',help='Paired reads file 2', required=False)
