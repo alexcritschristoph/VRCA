@@ -38,9 +38,10 @@ def self_align(seqs, read_length):
         f.write(">" + seq.id + "\n")
         f.write(str(combined))
         f.seek(0)
-        f.close()
+        
         #run lastz
         output = subprocess.check_output(["lastz", f.name, "--self", "--notrivial", "--nomirror", "--format=general-:start1,end1,start2,end2,score,strand1,strand2,identity,length1"]);
+        f.close()
         results = output.split("\n")
         for result in results:
             if result != '':
