@@ -246,7 +246,7 @@ if __name__ == "__main__":
 	    f.write(str(seqs[contig]) + "\n")
         f.close()
 
-    consensus = 0
+    consensus = []
     if program == 'both':
         consensus = list(set(paired_results).intersection(self_aligned))
 
