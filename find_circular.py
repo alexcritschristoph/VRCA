@@ -34,7 +34,7 @@ def self_align(seqs, read_length):
         seq_part1 = str(seq.seq[0:read_length])
         seq_part2 = str(seq.seq[len(seq.seq)-read_length:len(seq.seq)])
         combined = seq_part1 + seq_part2
-        f = tempfile.NamedTemporaryFile(delete=False)
+        f = tempfile.NamedTemporaryFile(delete=True)
         f.write(">" + seq.id + "\n")
         f.write(str(combined))
         f.seek(0)
