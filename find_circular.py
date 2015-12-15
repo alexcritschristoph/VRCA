@@ -261,5 +261,5 @@ if __name__ == "__main__":
     os.system('rm ' + assembly + '_output* > /dev/null 2>&1')
     os.system('rm ' + assembly + '_overlap* > /dev/null 2>&1')
     print "Found " + str(len(self_aligned)) + " putative circular contigs with lastz and " + str(len(paired_results)) + " putative circular contigs using bowtie2. " + str(len(consensus)) + " contigs were found by both methods."
-    print "Completed. Output stored in " + assembly + '_circular_lastz.fna, ' + assembly + '_circular_bowtie.fna, and ' + assembly + "_circular_consensus.fna."
+    print "Completed. Output stored in " + assembly.split("/")[-1] + '_circular_lastz.fna, ' + assembly.split("/")[-1] + '_circular_bowtie.fna, and ' + assembly.split("/")[-1] + "_circular_consensus.fna."
 
