@@ -144,7 +144,6 @@ def run_bowtie(assembly, reads_1, reads_2):
 if __name__ == "__main__":
 
     __author__ = "Alex Crits-Christoph"
-    print sys.argv
 
     parser = argparse.ArgumentParser(description='Finds circular contigs using lastz and bowtie.')
     parser.add_argument('-i','--input', help='Input assembly filename',required=True)
@@ -234,22 +233,23 @@ if __name__ == "__main__":
     for seq_r in contigs_copy:
         seqs[seq_r.id] = seq_r.seq
     if program != 'bowtie':
-        f = open(assembly + '_circular_lastz.fna', 'a+')
+        f = open(assembly.split("/")[-1] + '_circular_lastz.fna', 'a+')
         for contig in self_aligned:
      	    f.write(">" + str(contig) + "\n")
 	    f.write(str(seqs[contig]) + "\n")
         f.close()
     if program != 'lastz':
-        f = open(assembly + '_circular_bowtie.fna', 'a+')
+        f = open(assembly.split("/")[-1] + '_circular_bowtie.fna', 'a+')
         for contig in paired_results:
 	    f.write(">" + str(contig) + "\n")
 	    f.write(str(seqs[contig]) + "\n")
         f.close()
 
+    consensus = 0
     if program == 'both':
         consensus = list(set(paired_results).intersection(self_aligned))
 
-        f = open(assembly + '_circular_consensus.fna', 'a+')
+        f = open(assembly.split("/")[-1] + '_circular_consensus.fna', 'a+')
         for contig in consensus:
             f.write(">" + str(contig) + "\n")
             f.write(str(seqs[contig]) + "\n")
