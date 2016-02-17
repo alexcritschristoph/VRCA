@@ -147,27 +147,20 @@ if __name__ == "__main__":
 		results = meta_marker.find_markers(metagenome)
 	
 	if program == 'md' or program == 'd':
+		#Compare with database
+		print "Comparing query tetranucleotide frequencies to database..."
+		print "*************** RESULTS ***************"
+		print "Viral contig: Top database matches"
 		for seqs in records:
-			print "Calculating tetranucleotide frequencies for query..."
 			tetramers = calc_tetra(seqs)
-
-			#Compare with database
-			
-			print "Comparing query tetranucleotide frequencies to database..."
 			result_string = read_data(tetramers, data)
-			print "*************** RESULTS ***************"
-			print "Viral contig: Top database matches"
 			print seqs.id + ": " + result_string 
 
-	if program == 'm':
+	if program == 'm' or program == 'md':
+		#Compare with contigs
+		print "Comparing query tetranucleotide frequencies to all marker contigs..."
+		print "*************** RESULTS ***************"
+		print "Viral contig: Top matches [blast_match (contig name)]" 
 		for seqs in records:
-			#Calculate Tetranucleotide frequencies for query
-			print ""
-			print "Calculating tetranucleotide frequencies for query..."
 			tetramers = calc_tetra(seqs)
-
-			#Compare with contigs
-			print "Comparing query tetranucleotide frequencies to all marker contigs..."
-			print "*************** RESULTS ***************"
-			print "Viral contig: Top matches [blast_match (contig name)]" 
 			print seqs.id + ": " + str(tetrat_compare(tetramers, results)[:3]).replace("]","").replace("[","")
