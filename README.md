@@ -2,13 +2,12 @@
 
 **`find_circular.py`**
 
-A python script that finds circular contigs in metagenome assemblies using two different methods.
+A python script that finds circular contigs in metagenome assemblies by identifying forward read overlaps at the start / end of contigs. Tested successfully on circular contigs from metagenome assemblies produced by Soapdenovo2, IDBA_UD, and SPAdes.
 
 Requirements:
 
-1. Lastz
-
-2. Bowtie2
+1. Lastz should be in your /usr/bin path.
+2. BioPython should be installed.
 
 **`identify_host.py`**
 
