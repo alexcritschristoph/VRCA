@@ -167,7 +167,7 @@ def visualize(data):
 		name = data[2][t]
 		
 		f.write(str(t) + "," + str(name) + "," + str(names[name]) + "," + str(fit[i,0]) + "," + str(fit[i,1]) + "\n")
-
+		i += 1
 	f.close()
 		#Add labels
 	positions = {}
