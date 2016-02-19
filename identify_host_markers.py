@@ -151,8 +151,24 @@ def visualize(data):
 	#plot it
 	plt.scatter(fit[0:contig_count,0], fit[0:contig_count:,1], s=sizes_list,  c=color_list, marker= 'o', alpha=0.9)
 	plt.scatter(fit[contig_count:,0], fit[contig_count:,1], marker= 'x', s=50, c="#ef1a1a", alpha=1)
+	
+	#Output graphical data to file
+	f = open('./pca_data.txt', 'w')
+	f.write("Host contigs:\n")
+	f.write("Contig name, BLAST hit, x coord, y coord\n")
+	i = 0
+	for t in sorted(data[0][0].keys()):
+		f.write(str(t) + "," + str(names[t]) + "," + str(fit[i,0]) + "," + str(fit[i,1]) + "\n")
+		i += 1
+	f.write("Viral contigs:\n")
+	f.write("Contig name, closest host contig, closest host name, x coord, y coord\n")
 
-	#Add labels
+	for t in sorted(data[1].keys()):
+		name = data[2][t]
+		
+		f.write(str(t) + "," + str(name) + "," + str(names[name]) + "," + str(fit[i,0]) + "," + str(fit[i,1]) + "\n")
+
+	f.close()
 		#Add labels
 	positions = {}
 	i = 0 
@@ -170,13 +186,13 @@ def visualize(data):
 		#plot line
 		plt.plot([fit[contig_count+i,0], fit[name,0]], [fit[contig_count+i,1], fit[name,1]], alpha=0.5)
 
-		plt.annotate(
-        t, 
-        xy = (fit[contig_count+i,0], fit[contig_count+i,1]), xytext = (0, -20),
-        textcoords = 'offset points', ha = 'right', va = 'bottom',
-        fontsize = 8,
-        bbox = dict(boxstyle = 'round,pad=0.2', fc = 'white', alpha = 0.5),
-        arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+       #		plt.annotate(
+       # t, 
+       # xy = (fit[contig_count+i,0], fit[contig_count+i,1]), xytext = (0, -20),
+       # textcoords = 'offset points', ha = 'right', va = 'bottom',
+       # fontsize = 8,
+       # bbox = dict(boxstyle = 'round,pad=0.2', fc = 'white', alpha = 0.5),
+       # arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
 
 		i += 1
 
