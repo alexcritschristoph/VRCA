@@ -202,7 +202,7 @@ if __name__ == "__main__":
 	parser.add_argument('-i','--input', help='Viral contig(s) fasta file',required=True)
 	parser.add_argument('-a','--assembly',help='Metagenome assembly FASTA file', required=False)
 	parser.add_argument('-p', '--program', help="Program to run: 'd' for matching a database, 'm' for matching metagenomic assembled contigs, and 'md' for matching reference data for species found in the metagenomic assembly", required=False)
-	parser.add_argument('-v', '--visualize', help="Visualizes a PCA of tetranucleotide frequencies of host contigs and viral contigs.", required=False)
+	parser.add_argument('-v', '--visualize', help="Visualizes a PCA of tetranucleotide frequencies of host contigs and viral contigs.", required=False, action='store_true')
 
 	args = parser.parse_args()
 	if args.input:
