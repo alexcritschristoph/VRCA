@@ -9,7 +9,6 @@ import subprocess
 from collections import Counter
 from scipy.spatial import distance
 import numpy as np
-from sklearn.decomposition import PCA
 
 def translate_6frames(input_file, min_size):
 	input_handle = open(input_file, "rU")	
@@ -143,7 +142,7 @@ def find_markers(assembly):
 			tetramers[record.id] = calc_tetra(record)
 			sizes[record.id] = len(record.seq)
 
-	return [tetramers, names]
+	return [tetramers, names, sizes]
 	# #Run PCA on that
 	# print "Using Scikitlearn to run PCA on 4mer distances..."
 
@@ -157,4 +156,3 @@ def find_markers(assembly):
 	# tetramers_np = np.array(tetramer_array)
 	# pca = PCA(n_components=2)
 	# fit = pca.fit(tetramers_np).transform(tetramers_np)
-

@@ -6,6 +6,11 @@ from marker_genes import meta_marker
 import operator
 import argparse
 import os.path
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter
+
 def calc_tetra(seqs):
 
 	tetramers = {}
@@ -65,9 +70,11 @@ def read_data(tetramers, data):
 def tetrat_compare(tetramers1, results):
 	#Normalize
 	distances = {}
+	real_names = {}
 	for tets in results[0]:
 		tetramers2 = results[0][tets]
 		name = results[1][tets] + " (" + tets + ")"
+		real_names[results[1][tets] + " (" + tets + ")"] = tets
 
 		total = sum(tetramers1.values())
 		for k in tetramers1.keys():
@@ -85,7 +92,108 @@ def tetrat_compare(tetramers1, results):
 		for d in sorted(tetramers2.keys()):
 			subject_dat.append(tetramers2[d])
 		distances[name] = round(distance.euclidean(query_dat, subject_dat),5)
-	return sorted(distances.items(), key=operator.itemgetter(1))
+	return [real_names, sorted(distances.items(), key=operator.itemgetter(1))]
+
+def visualize(data):
+	print "visualizing results..."
+	tetramer_array = []
+	names = data[0][1]
+	sizes = data[0][2]
+	contig_count = 0
+	name_pos = []
+	for t in sorted(data[0][0].keys()):
+		name_pos.append(t)
+		contig_count += 1
+		temp = []
+		for tet in sorted(data[0][0][t].keys()):
+			temp.append(data[0][0][t][tet])
+		tetramer_array.append(temp)
+
+	for t in sorted(data[1].keys()):
+		temp = []
+		for tet in sorted(data[1][t].keys()):
+			temp.append(data[1][t][tet])
+		tetramer_array.append(temp)
+
+	tetramers_np = np.array(tetramer_array)
+	pca = PCA(n_components=2)
+	fit = pca.fit(tetramers_np).transform(tetramers_np)
+
+	#Contig sizing
+	for contig in sizes:
+		sizes[contig] = float(sizes[contig]) / float(max(sizes.values())) * 250 + 35
+	sizes_list = []
+	for contig in sorted(sizes.keys()):
+		sizes_list.append(sizes[contig])
+
+	#Contig colors
+	color_assigned = {}
+	color_list = []
+	color_brewer = ['#1f78b4', '#33a02c', '#e31a1c', '#ff7f00', '#6a3d9a', '#b15928', '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f', '#cab2d6', '#ffff99']
+	i = 0
+	#assign colors
+	most_common_names = Counter(names.values()).most_common()
+	for name in most_common_names:
+		if len(name) > 1:
+			n = name[0]
+			if n not in color_assigned:
+				if i < len(color_brewer)-1:
+					color_assigned[n] = color_brewer[i]
+					i += 1
+				else:
+					color_assigned[n] = color_brewer[i]
+		else:
+			color_assigned[n] = '#ffff99'
+	#create color list
+	for name in sorted(names.keys()):
+		color_list.append(color_assigned[names[name]])
+
+	#plot it
+	plt.scatter(fit[0:contig_count,0], fit[0:contig_count:,1], s=sizes_list,  c=color_list, marker= 'o', alpha=0.9)
+	plt.scatter(fit[contig_count:,0], fit[contig_count:,1], marker= 'x', s=50, c="#ef1a1a", alpha=1)
+
+	#Add labels
+		#Add labels
+	positions = {}
+	i = 0 
+	avg_size = sum(sizes.values()) / len(sizes.values())
+	for name in sorted(names.keys()):
+		if len(names.keys()) > 5 and sizes[name] > avg_size:
+			positions[names[name]] = [fit[i,0], fit[i,1]]
+		i += 1
+
+	#Plot virus - closest host lines
+	i = 0
+	for t in sorted(data[1].keys()):
+		#get pos of name in fit
+		name = name_pos.index(data[2][t])
+		#plot line
+		plt.plot([fit[contig_count+i,0], fit[name,0]], [fit[contig_count+i,1], fit[name,1]], alpha=0.5)
+
+		plt.annotate(
+        t, 
+        xy = (fit[contig_count+i,0], fit[contig_count+i,1]), xytext = (0, -20),
+        textcoords = 'offset points', ha = 'right', va = 'bottom',
+        fontsize = 8,
+        bbox = dict(boxstyle = 'round,pad=0.2', fc = 'white', alpha = 0.5),
+        arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+
+		i += 1
+
+	for name in positions.keys():
+		x = positions[name][0]
+		y = positions[name][1]
+		
+		plt.annotate(
+        name, 
+        xy = (x, y), xytext = (-30, 30),
+        textcoords = 'offset points', ha = 'right', va = 'bottom',
+        fontsize = 10,
+        bbox = dict(boxstyle = 'round,pad=0.2', fc = 'white', alpha = 0.5),
+        arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+
+
+	plt.show()
 
 if __name__ == "__main__":
 
@@ -94,6 +202,7 @@ if __name__ == "__main__":
 	parser.add_argument('-i','--input', help='Viral contig(s) fasta file',required=True)
 	parser.add_argument('-a','--assembly',help='Metagenome assembly FASTA file', required=False)
 	parser.add_argument('-p', '--program', help="Program to run: 'd' for matching a database, 'm' for matching metagenomic assembled contigs, and 'md' for matching reference data for species found in the metagenomic assembly", required=False)
+	parser.add_argument('-v', '--visualize', help="Visualizes a PCA of tetranucleotide frequencies of host contigs and viral contigs.", required=False)
 
 	args = parser.parse_args()
 	if args.input:
@@ -161,6 +270,13 @@ if __name__ == "__main__":
 		print "Comparing query tetranucleotide frequencies to all marker contigs..."
 		print "*************** RESULTS ***************"
 		print "Viral contig: Top matches [blast_match (contig name)]" 
+		combined_results = [results, {}, {}]
 		for seqs in records:
 			tetramers = calc_tetra(seqs)
-			print seqs.id + ": " + str(tetrat_compare(tetramers, results)[:3]).replace("]","").replace("[","")
+			tetrats = tetrat_compare(tetramers, results)
+			top_three = tetrats[1][:3]
+			print seqs.id + ": " + str(top_three).replace("]","").replace("[","")
+			combined_results[1][seqs.id] = tetramers
+			combined_results[2][seqs.id] = tetrats[0][top_three[0][0]]
+		if args.visualize:
+			visualize(combined_results)
