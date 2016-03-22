@@ -1,4 +1,4 @@
-## VIral and Circular content from metAgenomes
+## VIral and Circular content from metAgenomes (Vica)
 
 **`find_circular.py`**
 
