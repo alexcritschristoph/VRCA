@@ -1,4 +1,4 @@
-## Detecting Viral and Circular Contigs in Metagenomes.
+## VIral and Circular content from metAgenomes
 
 **`find_circular.py`**
 
