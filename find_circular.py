@@ -56,8 +56,8 @@ def self_align(seqs, read_length):
                 if strand1 == strand2 and length > 0.4 * read_length and float(fractions.Fraction(identity)) > 0.95:
                     if int(start1) < 5 and int(start2) > read_length and int(end1) < read_length and int(end2) > read_length*2 * 0.9: 
                         print seq.id
-			print result
-			if seq.id not in positive_self_aligns:
+                        print result
+                        if seq.id not in positive_self_aligns:
                             positive_self_aligns.append(seq.id)
     return positive_self_aligns
 
@@ -109,14 +109,17 @@ if __name__ == "__main__":
     #Write to file
     print "Writing to files..."
     seqs = {}
-    for seq_r in contigs_copy:
-        seqs[seq_r.id] = seq_r.seq
-    f = open(assembly.split("/")[-1] + '_circular.fna', 'a+')
-    for contig in self_aligned:
- 	    f.write(">" + str(contig) + "\n")
-    f.write(str(seqs[contig]) + "\n")
-    f.close()
-    
+    if len(self_aligned) > 0:
+        for seq_r in contigs_copy:
+            seqs[seq_r.id] = seq_r.seq
+        f = open(assembly.split("/")[-1] + '_circular.fna', 'a+')
+        for contig in self_aligned:
+            f.write(">" + str(contig) + "\n")
+            f.write(str(seqs[contig]) + "\n")
+        f.close()
+    else:
+        print "Error: No circular contigs were found."
+        sys.exit(1)
     #Clean up
     os.system('rm ' + assembly + '.* > /dev/null 2>&1')
     os.system('rm ' + assembly + '_output* > /dev/null 2>&1')
