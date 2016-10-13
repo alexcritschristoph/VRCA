@@ -2,7 +2,9 @@
 from sklearn.ensemble import RandomForestClassifier 
 from sklearn import cross_validation
 import numpy as np
-dataset = np.loadtxt('training_data.csv', delimiter=",")
+import cPickle as pickle
+
+dataset = np.loadtxt('combined_training.csv', delimiter=",")
 
 # Create the random forest object which will include all the parameters
 # for the fit
@@ -21,4 +23,4 @@ std = np.std([tree.feature_importances_ for tree in forest.estimators_],
 #cross cross_validation
 scores = cross_validation.cross_val_score(forest_fit, dataset[0::,1::], dataset[0::,0], cv=5)
 
-s = pickle.dump(forest_fit)
+s = pickle.dump(forest_fit, open('./classifier.p', 'wb'))
