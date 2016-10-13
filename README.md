@@ -4,23 +4,48 @@
 
 Finds circular contigs in metagenome assemblies by identifying forward read overlaps at the start / end of contigs. Tested successfully on circular contigs from metagenome assemblies produced by Soapdenovo2, IDBA_UD, and SPAdes.
 
-Requirements:
+Requirements: (1) [Lastz](http://www.bx.psu.edu/~rsharris/lastz/) should be in your /usr/bin path, (2) BioPython.
 
-1. Lastz should be in your /usr/bin path.
-2. BioPython should be installed.
+```
+usage: find_circular.py [-h] -i INPUT [-l READ_LENGTH] [-m MIN_CONTIG_SIZE]
+
+Finds circular contigs using lastz.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Input assembly filename
+  -l READ_LENGTH, --read_length READ_LENGTH
+                        Read length (default: 101 bp)
+  -m MIN_CONTIG_SIZE, --min_contig_size MIN_CONTIG_SIZE
+                        Minimum contig size to check for (default: 3 kbp)
+```
 
 **`classify.py`**
 
 Classifies contigs based on gene size, strandedness, and intergenic region length. Works best on contigs > 10 Kb; will only attempt to classify contigs with at least 10 coding regions.
 
-Requirements:
-
-1. BioPython 
-2. Scikit-learn
-3. Prodigal
+Requirements: BioPython, Scikit-learn, [Prodigal](https://github.com/hyattpd/Prodigal/wiki/installation).
 
 ```
-python classify.py metagenome_assembly.fa
+python classify.py -i metagenome_assembly.fa
+```
+
+```
+usage: classify.py [-h] -i INPUT [-m MIN_CONTIG_SIZE] [-p PRODIGAL_PATH]
+
+Classifies viral metagenomic contigs using a random forest classifier built on
+public datasets. Features are gene length, intergenic space length,
+strandedness, and prodigal calling gene confidence.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Input assembly filename
+  -m MIN_CONTIG_SIZE, --min_contig_size MIN_CONTIG_SIZE
+                        Minimum contig size to use (default: 10 kbp)
+  -p PRODIGAL_PATH, --prodigal_path PRODIGAL_PATH
+                        Path to prodigal (default: prodigal)
 ```
 
 **`identify_host.py`**
