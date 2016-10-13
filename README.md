@@ -1,5 +1,6 @@
 ## VIral and Circular content from metAgenomes (VICA)
 
+
 **`find_circular.py`**
 
 Finds circular contigs in metagenome assemblies by identifying forward read overlaps at the start / end of contigs. Tested successfully on circular contigs from metagenome assemblies produced by Soapdenovo2, IDBA_UD, and SPAdes.
@@ -20,6 +21,7 @@ optional arguments:
   -m MIN_CONTIG_SIZE, --min_contig_size MIN_CONTIG_SIZE
                         Minimum contig size to check for (default: 3 kbp)
 ```
+
 
 **`classify.py`**
 
@@ -47,6 +49,7 @@ optional arguments:
   -p PRODIGAL_PATH, --prodigal_path PRODIGAL_PATH
                         Path to prodigal (default: prodigal)
 ```
+
 
 **`identify_host.py`**
 
