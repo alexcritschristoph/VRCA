@@ -20,10 +20,10 @@ def main(input_file, prodigal_path, min_contig):
 
 	#Check that prodigal is installed
 	try: 
-	    subprocess.call(["which", prodigal_path])
+		subprocess.call(["which", prodigal_path])
 	except: 
-	    print "Error: Prodigal is not installed and available with the specified path."
-	    sys.exit(1)
+		print "Error: Prodigal is not installed and available with the specified path."
+		sys.exit(1)
 
 	#Check that the input file exists
 	if not os.path.isfile(input_file):
@@ -32,18 +32,18 @@ def main(input_file, prodigal_path, min_contig):
 
 	#Remove old output
 	with open(os.devnull, 'wb') as devnull:
-	    subprocess.check_call(['rm','-rf','./' + input_file.split("/")[-1] + '_output/'], stdout=devnull, stderr=subprocess.STDOUT)
+		subprocess.check_call(['rm','-rf','./' + input_file.split("/")[-1].split(".")[0] + '_output/'], stdout=devnull, stderr=subprocess.STDOUT)
 
 	#Make new directory
 	with open(os.devnull, 'wb') as devnull:
-	    subprocess.check_call(['mkdir','./' + input_file.split("/")[-1] + '_output/'], stdout=devnull, stderr=subprocess.STDOUT)
+		subprocess.check_call(['mkdir','./' + input_file.split("/")[-1].split(".")[0] + '_output/'], stdout=devnull, stderr=subprocess.STDOUT)
 
 	#Keep only contigs > min_length
 	print "[1] Excluding contigs less than " + str(min_contig) + " bp in length."
 	handle = open(input_file, "rU")
 	l = SeqIO.parse(handle, "fasta")
 
-	new_input = './' + input_file.split("/")[-1] + '_output/' + input_file.split("/")[-1] + "_filtered.fa"
+	new_input = './' + input_file.split("/")[-1].split(".")[0] + '_output/' + input_file.split("/")[-1].split(".")[0] + "_filtered.fa"
 	f = open(new_input, 'a+')
 	contig_list = {}
 	for s in l:
@@ -55,7 +55,7 @@ def main(input_file, prodigal_path, min_contig):
 
 	#Run prodigal
 	print "[2] Predicting genes and proteins with Prodigal (this could take a while)..."
-	sts = subprocess.Popen(prodigal_path + ' -p meta -f gff -o ./'  + input_file.split("/")[-1] + '_output/temp.gff -i ' + new_input + ' -q', shell=True).wait()
+	sts = subprocess.Popen(prodigal_path + ' -p meta -f gff -o ./'  + input_file.split("/")[-1].split(".")[0] + '_output/temp.gff -i ' + new_input + ' -q', shell=True).wait()
 
 
 	print "[3] Generating features for machine learning..."
@@ -65,7 +65,7 @@ def main(input_file, prodigal_path, min_contig):
 	confs = {}
 	strands = {}
 
-	with open('./' + input_file.split("/")[-1] + '_output/temp.gff', "r") as f:
+	with open('./' + input_file.split("/")[-1].split(".")[0] + '_output/temp.gff', "r") as f:
 		previous_end = 0
 		previous_strand = -1
 		previous_contig = ""
@@ -116,7 +116,7 @@ def main(input_file, prodigal_path, min_contig):
 				confs[contig].append(conf)
 				strands[contig].append(strandedness)
 
-	f = open('./' + input_file.split("/")[-1] + '_output/temp.dat','w+')
+	f = open('./' + input_file.split("/")[-1].split(".")[0] + '_output/temp.dat','w+')
 	for contig in contigs:
 		if len(genes[contig]) > 10:
 			f.write(str(float(sum(genes[contig])) / len(genes[contig])) +  "," + str(float(sum(introns[contig])) / len(introns[contig])) + "," + str(float(sum(confs[contig])) / len(confs[contig])) + "," + str(float(sum(strands[contig])) / len(strands[contig])) + "\n")
@@ -132,7 +132,7 @@ def main(input_file, prodigal_path, min_contig):
 		sys.exit(1)
 
 	print "[5] Loading feature data..."
-	testdata = numpy.loadtxt('./' + input_file.split("/")[-1] + '_output/temp.dat', delimiter=",")
+	testdata = numpy.loadtxt('./' + input_file.split("/")[-1].split(".")[0] + '_output/temp.dat', delimiter=",")
 
 	print "[6] Classifing features..."
 	classified = list(forest_fit.predict(testdata))
@@ -148,27 +148,27 @@ def main(input_file, prodigal_path, min_contig):
 
 	results_string = results_string.rstrip(",")
 	print results_string 
-	print "[7] Saving results to ./" + input_file.split("/")[-1] + '_output/viral.fna'
-	f = open('./' + input_file.split("/")[-1] + '_output/viral.fna', 'a+')
+	print "[7] Saving results to ./" + input_file.split("/")[-1].split(".")[0] + '_output/viral.fna'
+	f = open('./' + input_file.split("/")[-1].split(".")[0] + '_output/viral.fna', 'a+')
 	for contig in viral_contigs:
 		f.write(">" + str(contig) + "\n")
-		f.write(str(contig_list[contig]))
+		f.write(str(contig_list[contig]) + "\n")
 
 	print "[8] Complete. Cleaning up and exiting..."
 
 if __name__ == '__main__':
 
-    __author__ = "Alex Crits-Christoph"
+	__author__ = "Alex Crits-Christoph"
 
-    parser = argparse.ArgumentParser(description='Classifies viral metagenomic contigs using a random forest classifier built on public datasets. Features are gene length, intergenic space length, strandedness, and prodigal calling gene confidence.')
-    parser.add_argument('-i','--input', help='Input assembly filename',required=True)
-    parser.add_argument('-m', '--min_contig_size', help='Minimum contig size to use (default: 10 kbp)', required=False)
-    parser.add_argument('-p', '--prodigal_path', help='Path to prodigal (default: prodigal)', required=False)
+	parser = argparse.ArgumentParser(description='Classifies viral metagenomic contigs using a random forest classifier built on public datasets. Features are gene length, intergenic space length, strandedness, and prodigal calling gene confidence.')
+	parser.add_argument('-i','--input', help='Input assembly filename',required=True)
+	parser.add_argument('-m', '--min_contig_size', help='Minimum contig size to use (default: 10 kbp)', required=False)
+	parser.add_argument('-p', '--prodigal_path', help='Path to prodigal (default: prodigal)', required=False)
 
-    args = parser.parse_args()
-    if args.min_contig_size == None:
-    	args.min_contig_size = 10000
-    if args.prodigal_path == None:
-    	args.prodigal_path = 'prodigal'
+	args = parser.parse_args()
+	if args.min_contig_size == None:
+		args.min_contig_size = 10000
+	if args.prodigal_path == None:
+		args.prodigal_path = 'prodigal'
 	
 	main(args.input, args.prodigal_path, args.min_contig_size)
