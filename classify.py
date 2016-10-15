@@ -1,3 +1,9 @@
+'''
+Alex Crits-Christoph
+License: GPL3
+Classifies viral metagenomic contigs using a random forest classifier built on public datasets.
+'''
+
 import sys
 import numpy
 import subprocess
@@ -145,7 +151,7 @@ def main(input_file, prodigal_path, min_contig):
 	print "[7] Saving results to ./" + input_file.split("/")[-1] + '_output/viral.fna'
 	f = open('./' + input_file.split("/")[-1] + '_output/viral.fna', 'a+')
 	for contig in viral_contigs:
-		f.write(">" + str(contig_list[contig]) + "\n")
+		f.write(">" + str(contig) + "\n")
 		f.write(str(contig_list[contig]))
 
 	print "[8] Complete. Cleaning up and exiting..."
