@@ -9,6 +9,7 @@ import subprocess
 from collections import Counter
 from scipy.spatial import distance
 import numpy as np
+import os
 
 def translate_6frames(input_file, min_size):
 	input_handle = open(input_file, "rU")	
@@ -70,7 +71,7 @@ def calc_tetra(seq_record):
 
 	return tetramers
 
-def find_markers(assembly):
+def find_markers(assembly, blast_path, hmmsearch_path, output_dir):
 
 	input_file = assembly
 
@@ -78,18 +79,41 @@ def find_markers(assembly):
 	min_size = 10000
 
 	#Translate contigs in all 6 frames
-	print "Translating DNA..."
+	print "[SEARCH] Translating DNA into reading frames, creating /tmp/ file"
 	tempfile = translate_6frames(input_file, min_size)
 
 	#Search for markers using hmm file
-	print "Searching for marker proteins..."
-	output = subprocess.Popen(["hmmsearch", "-A", tempfile.name + ".aa", './marker_genes/ribosomal.hmm', tempfile.name], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)	
-	stdout, stderr = output.communicate()
 
+	## Check for required files and programs
+	if not os.path.isfile('./marker_genes/ribosomal.hmm'):
+		print "[ERROR] Could not find marker gene file ./marker_genes/ribosomal.hmm in local directory"
+		sys.exit(1)
+
+	if not os.path.isfile('./marker_genes/markers.pin'):
+		print "[ERROR] Could not find BLAST marker gene DB ./marker_genes/markers.pin in local directory"
+		sys.exit(1)
+
+	try: 
+		subprocess.call(["which", hmmsearch_path])
+	except: 
+		print "[ERROR] HMMSEARCH is not installed and available with the specified path: " + hmmsearch_path
+		sys.exit(1)
+
+	try: 
+		subprocess.call(["which", blast_path])
+	except: 
+		print "[ERROR] BLASTP is not installed and available with the specified path: " + blast_path
+		sys.exit(1)
+
+	#Run search
+	print "[SEARCH] Searching for marker proteins with hmmsearch"
+	output = subprocess.Popen([hmmsearch_path, "-A", tempfile.name + ".aa", './marker_genes/ribosomal.hmm', tempfile.name], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)	
+	stdout, stderr = output.communicate()
 	#Write out markers
-	print "Outputting marker proteins..."
 	i = 0
-	fname = '.'.join(input_file.split(".")[:-1]) + ".markers"
+	fname = output_dir.rstrip("/")  + '/.'.join(input_file.split(".")[:-1]) + ".markers"
+	print "[SEARCH] Writing marker proteins to file " + fname
+
 	f = open(fname, 'w')
 	for al in AlignIO.parse(open(tempfile.name + ".aa"), "stockholm"):
 		for seq in al:
@@ -99,16 +123,16 @@ def find_markers(assembly):
 	f.close()
 
 	if i == 0:
-		print "Error: No marker proteins found on all contigs in the assembly. Try running the database matching -d program."
+		print "[ERROR] No marker proteins found on all contigs in the assembly. Try running the database matching -d program."
 		sys.exit()
 	#BLAST markers against blast db
-	print "Blasting marker proteins against reference DB..."
-	output = subprocess.check_output(['blastp', '-query', fname, '-db', './marker_genes/markers', '-outfmt', '6 qseqid stitle pident evalue', '-max_target_seqs', '1'])
+	print "[SEARCH] Blasting marker proteins against reference DB"
+	output = subprocess.check_output([blast_path, '-query', fname, '-db', './marker_genes/markers', '-outfmt', '6 qseqid stitle pident evalue', '-max_target_seqs', '1'])
 	lines = str(output).splitlines()
 
+	fname = output_dir.rstrip("/") + '/.'.join(input_file.split(".")[:-1]) + ".blast"
+	print "[SEARCH] Writing marker protein BLAST matches to file " + fname
 
-	print "Outputting marker protein BLAST results..."
-	fname = '.'.join(input_file.split(".")[:-1]) + ".blast"
 	f = open(fname, 'w')
 	for line in lines:
 		f.write(line + "\n")
@@ -133,7 +157,7 @@ def find_markers(assembly):
 		names[contig] = str(count.most_common(1)[0][0])
 
 	#Calculate tetranucleotide frequencies for all marked contigs
-	print "Calculating tetranucleotide frequencies for marker contigs..."
+	print "[SEARCH] Calculating tetranucleotide frequencies for marker contigs"
 	tetramers = {}
 	sizes = {}
 	input_handle = open(input_file, "rU")
@@ -143,16 +167,3 @@ def find_markers(assembly):
 			sizes[record.id] = len(record.seq)
 
 	return [tetramers, names, sizes]
-	# #Run PCA on that
-	# print "Using Scikitlearn to run PCA on 4mer distances..."
-
-	# tetramer_array = []
-	# for t in sorted(tetramers.keys()):
-	# 	temp = []
-	# 	for tet in sorted(tetramers[t].keys()):
-	# 		temp.append(tetramers[t][tet])
-	# 	tetramer_array.append(temp)
-
-	# tetramers_np = np.array(tetramer_array)
-	# pca = PCA(n_components=2)
-	# fit = pca.fit(tetramers_np).transform(tetramers_np)

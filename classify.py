@@ -22,12 +22,12 @@ def main(input_file, prodigal_path, min_contig):
 	try: 
 		subprocess.call(["which", prodigal_path])
 	except: 
-		print "Error: Prodigal is not installed and available with the specified path."
+		print "[ERROR] Prodigal is not installed and available with the specified path."
 		sys.exit(1)
 
 	#Check that the input file exists
 	if not os.path.isfile(input_file):
-		print "Error: The input file does not appear to exist."
+		print "[ERROR] The input file does not appear to exist."
 		sys.exit(1)
 
 	#Remove old output
