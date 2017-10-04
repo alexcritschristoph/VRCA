@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Alex Crits-Christoph
 License: GPL3
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Finds circular contigs using lastz.')
     parser.add_argument('-i','--input', help='Input assembly filename',required=True)
-    parser.add_argument('-l','--read_length',help='Read length (default: 101 bp)', required=False)
+    parser.add_argument('-l','--read_length',help='Read length (default: 101 bp) [this is what will be checked for overlap]', required=False)
     parser.add_argument('-m', '--min_contig_size', help='Minimum contig size to check for (default: 3 kbp)', required=False)
 
     args = parser.parse_args()
@@ -92,11 +93,11 @@ if __name__ == "__main__":
         read_length = int(args.read_length)
            
     #Remove old temporary files if they exist.
-    print "Removing old temp files"
-    os.system('rm ' + assembly + '.* > /dev/null 2>&1')
-    os.system('rm ' + assembly + '_* > /dev/null 2>&1')
+    print "Removing old temp files [Nope, I'm not -Matt]"
+    #os.system('rm ' + assembly + '.* > /dev/null 2>&1')
+    #os.system('rm ' + assembly + '_* > /dev/null 2>&1')
 
-    #import contigs
+    #import contigs [all this is doing is filtering by size]
     contigs = import_contigs(assembly, min_contig)
     contigs_copy = contigs
 
@@ -121,9 +122,9 @@ if __name__ == "__main__":
         print "Error: No circular contigs were found."
         sys.exit(1)
     #Clean up
-    os.system('rm ' + assembly + '.* > /dev/null 2>&1')
-    os.system('rm ' + assembly + '_output* > /dev/null 2>&1')
-    os.system('rm ' + assembly + '_overlap* > /dev/null 2>&1')
+    #os.system('rm ' + assembly + '.* > /dev/null 2>&1')
+    #os.system('rm ' + assembly + '_output* > /dev/null 2>&1')
+    #os.system('rm ' + assembly + '_overlap* > /dev/null 2>&1')
     print "Found " + str(len(self_aligned)) + " putative circular contigs."
     print "Completed. Output stored in " + assembly.split("/")[-1] + '_circular.fna.'
 
