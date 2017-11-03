@@ -1,5 +1,18 @@
 ## VIral and Circular content from metAgenomes (VICA)
 
+** find_circular_fast.py **
+
+Quickly finds circular contigs in metagenome assemblies by looking for the overlap at the start and end of contigs. Please run `pip install edlib` prior to running.
+
+Usage:
+
+```
+python find_circular_fast.py contigs.fasta 150 2 contigs
+```
+Where 150 bp is the read length, 2 is the number of allowed matches, and the final argument is either 'contigs' or 'ids' to specify whether to output the circular contigs or just their ids.
+
+Note: if 1 read length doesn't work for your assembly try 1/2 the read length - some assemblers chop off the overlap this way.
+
 
 **`find_circular.py`**
 
