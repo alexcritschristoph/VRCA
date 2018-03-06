@@ -2,7 +2,7 @@
 
 **`find_circular_fast.py`**
 
-Quickly finds circular contigs in metagenome assemblies by looking for the overlap at the start and end of contigs. Please run `pip install edlib` prior to running.
+Quickly finds circular contigs in metagenome assemblies by looking for the overlap at the start and end of contigs. Please run `pip install edlib` prior to running. Note that sometimes this doesn't find all circular contigs - if it isn't working well for you, please run the original `find_circular.py`! That script is also better tested on more real world metagenomes than this one.
 
 Usage:
 
