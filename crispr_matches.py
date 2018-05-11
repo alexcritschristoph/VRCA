@@ -1,3 +1,8 @@
+'''
+Finds CRISPR spacers in a metagenome; then looks to see if those spacers have good BLAST matches to other contigs in that metagenome.
+The implication is the CRISPR spacer will be on a host contig and the BLAST match on the other contig could be a phage it is targeting.
+'''
+
 import sys
 import argparse
 import subprocess
