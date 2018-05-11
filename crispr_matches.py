@@ -36,28 +36,28 @@ if __name__ == "__main__":
 	if args.input:
 		assembly = args.input
 	else:
-		print "ERROR: No assembly file indicated. Use like: crispr_matches -i assembly.fna"
+		print("ERROR: No assembly file indicated. Use like: crispr_matches -i assembly.fna")
 		sys.exit()
 
 	if not which("minced"):
-		print "ERROR: Please install the program minced in your path."
+		print("ERROR: Please install the program minced in your path.")
 		sys.exit()
 
 	if not which("makeblastdb"):
-		print "ERROR: Please install BLAST+ (makeblastdb) in your path."
+		print("ERROR: Please install BLAST+ (makeblastdb) in your path.")
 		sys.exit()		
 
 	if not which("blastn"):
-		print "ERROR: Please install BLAST+ (blastn) in your path."
+		print("ERROR: Please install BLAST+ (blastn) in your path.")
 		sys.exit()		
 
-	print "All requirements met. Creating new output directory..."
+	print("All requirements met. Creating new output directory...")
 	os.system("rm -rf " + assembly + "_crispr_matches")
 	os.system("mkdir " + assembly + "_crispr_matches")
 	os.system("cp " + assembly + " ./" + assembly+ "_crispr_matches")
 
 	filename = "./" + assembly+ "_crispr_matches/" + assembly
-	print "Finding CRISPRs with minced..."
+	print("Finding CRISPRs with minced...")
 	output = subprocess.check_output(["minced", "-gff", "-spacers", filename]);
 	lines = output.split("\n")
 
@@ -79,9 +79,9 @@ if __name__ == "__main__":
 	for contig in crispr_contigs:
 		crisprs.write(">" + contig + "\n")
 		crisprs.write(records_dict[contig] + "\n")
-	print str(len(crispr_contigs)) + " contigs with CRISPRs found, stored in " + assembly+ "_crispr_matches/" + assembly + "_crisprs.fna"
+	print(str(len(crispr_contigs)) + " contigs with CRISPRs found, stored in " + assembly+ "_crispr_matches/" + assembly + "_crisprs.fna")
 
-	print "Creating blastdb for non-CRISPR contigs..."
+	print("Creating blastdb for non-CRISPR contigs...")
 
 	f = open("./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna', 'a+')
 	for contig in records_dict:
@@ -92,10 +92,10 @@ if __name__ == "__main__":
 
 	output = subprocess.check_output("makeblastdb" + " -in " + "./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna' + " -dbtype nucl", shell=True)
 
-	print "BLASTing spacers against non-CRISPR contigs..."
+	print("BLASTing spacers against non-CRISPR contigs...")
 	output = subprocess.check_output("blastn " + "-query " + "./" + assembly+ "_crispr_matches/" + assembly.split(".")[0] + "_spacers.fa" + " -db " + "./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna' + " -outfmt 6", shell=True)
 	
-	print "Host/CRISPR contig\tHost contig length\tSpacer #\tViral contig\tViral contig length\tMatch PID\tMatch Length\tHost GC%\tViral GC%"
+	print("Host/CRISPR contig\tHost contig length\tSpacer #\tViral contig\tViral contig length\tMatch PID\tMatch Length\tHost GC%\tViral GC%")
 	for line in output.split("\n"):
 		crispr_contig = line.split("_CRISPR")[0]
 		crispr_spacer = line.split("spacer_")[1].split()[0]
@@ -106,4 +106,4 @@ if __name__ == "__main__":
 		length = line.split("\t")[3]
 		host_gc = str(GC(records_dict[crispr_contig]))
 		viral_gc = str(GC(records_dict[viral_contig]))
-		print crispr_contig + "\t" + crispr_length + "\t" + crispr_spacer + "\t" + viral_contig + "\t" + viral_length + "\t" + pid + "\t" + length + "\t" + host_gc + "\t" + viral_gc
+		print(crispr_contig + "\t" + crispr_length + "\t" + crispr_spacer + "\t" + viral_contig + "\t" + viral_length + "\t" + pid + "\t" + length + "\t" + host_gc + "\t" + viral_gc)
