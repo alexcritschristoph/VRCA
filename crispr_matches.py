@@ -58,8 +58,8 @@ if __name__ == "__main__":
 
 	filename = "./" + assembly+ "_crispr_matches/" + assembly
 	print("Finding CRISPRs with minced...")
-	output = subprocess.check_output(["minced", "-gff", "-spacers", filename]);
-	lines = output.split("\n")
+	output = subprocess.check_output(["minced", "-gff", "-spacers", filename], encoding='utf8')
+#	lines = output.split("\n")
 
 
 	#Read fasta file
@@ -90,20 +90,23 @@ if __name__ == "__main__":
 			f.write(records_dict[contig] + "\n")
 	f.close()
 
-	output = subprocess.check_output("makeblastdb" + " -in " + "./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna' + " -dbtype nucl", shell=True)
+	output = subprocess.check_output("makeblastdb" + " -in " + "./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna' + " -dbtype nucl", shell=True, encoding='utf8')
 
 	print("BLASTing spacers against non-CRISPR contigs...")
-	output = subprocess.check_output("blastn " + "-query " + "./" + assembly+ "_crispr_matches/" + assembly.split(".")[0] + "_spacers.fa" + " -db " + "./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna' + " -outfmt 6", shell=True)
+	output = subprocess.check_output("blastn " + "-query " + "./" + assembly+ "_crispr_matches/" + assembly.split(".")[0] + "_spacers.fa" + " -db " + "./" + assembly+ "_crispr_matches/" + assembly + '_nocrisprs.fna' + " -outfmt 6", shell=True, encoding='utf8')
 	
 	print("Host/CRISPR contig\tHost contig length\tSpacer #\tViral contig\tViral contig length\tMatch PID\tMatch Length\tHost GC%\tViral GC%")
 	for line in output.split("\n"):
-		crispr_contig = line.split("_CRISPR")[0]
-		crispr_spacer = line.split("spacer_")[1].split()[0]
-		viral_contig = line.split("\t")[1]
-		crispr_length = str(len(records_dict[crispr_contig]))
-		viral_length = str(len(records_dict[viral_contig]))
-		pid = line.split("\t")[2]
-		length = line.split("\t")[3]
-		host_gc = str(GC(records_dict[crispr_contig]))
-		viral_gc = str(GC(records_dict[viral_contig]))
-		print(crispr_contig + "\t" + crispr_length + "\t" + crispr_spacer + "\t" + viral_contig + "\t" + viral_length + "\t" + pid + "\t" + length + "\t" + host_gc + "\t" + viral_gc)
+		try:
+			crispr_contig = line.split("_CRISPR")[0]
+			crispr_spacer = line.split("spacer_")[1].split()[0]
+			viral_contig = line.split("\t")[1]
+			crispr_length = str(len(records_dict[crispr_contig]))
+			viral_length = str(len(records_dict[viral_contig]))
+			pid = line.split("\t")[2]
+			length = line.split("\t")[3]
+			host_gc = str(GC(records_dict[crispr_contig]))
+			viral_gc = str(GC(records_dict[viral_contig]))
+			print(crispr_contig + "\t" + crispr_length + "\t" + crispr_spacer + "\t" + viral_contig + "\t" + viral_length + "\t" + pid + "\t" + length + "\t" + host_gc + "\t" + viral_gc)
+		except:
+			pass
