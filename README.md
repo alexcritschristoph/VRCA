@@ -1,4 +1,8 @@
-## VIral and Circular content from metAgenomes (VICA)
+## VIral and Circular content from metAgenomes (VRCA)
+
+**Note: previously this software was called *VICA*, but the name has been changed to reduce confusion with another new software tool with this name. If you want to use the code in this repository, please cite:
+
+*Crits‐Christoph, Alexander, et al. "Functional interactions of archaea, bacteria and viruses in a hypersaline endolithic community." Environmental microbiology 18.6 (2016): 2064-2077.*
 
 **`find_circular_fast.py`**
 
