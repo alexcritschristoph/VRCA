@@ -15,7 +15,7 @@ import fractions
 
 #Build dictionary of all contigs in input
 def import_contigs(file_name, min_contig_size):
-    print "Importing contigs"
+    print("Importing contigs")
     handle = open(file_name, "rU")
     records = list(SeqIO.parse(handle, "fasta"))
     records_filtered = []
@@ -26,8 +26,8 @@ def import_contigs(file_name, min_contig_size):
 
 #Run lastz on each contig, check for self-alignment at ends.
 def self_align(seqs, read_length):
-    print "Self-aligning contigs using lastz"
-    print "Self-aligned contigs: "
+    print("Self-aligning contigs using lastz")
+    print("Self-aligned contigs: ")
     #Create temporary sequence file for lastz
     positive_self_aligns = []
     for seq in seqs:
@@ -35,17 +35,23 @@ def self_align(seqs, read_length):
         seq_part1 = str(seq.seq[0:read_length])
         seq_part2 = str(seq.seq[len(seq.seq)-read_length:len(seq.seq)])
         combined = seq_part1 + seq_part2
-        f = tempfile.NamedTemporaryFile(delete=True)
+        f = tempfile.NamedTemporaryFile(mode='w', delete=True)
+        # print('Wrote the tempfil succesfully. ')
+        # print(f)
+        # f.write('HELLO WORLD')
+        # print('Wrote something?')
         f.write(">" + seq.id + "\n")
         f.write(str(combined))
         f.seek(0)
-        
+
         #run lastz
         output = subprocess.check_output(["lastz", f.name, "--self", "--notrivial", "--nomirror", "--format=general-:start1,end1,start2,end2,score,strand1,strand2,identity,length1"]);
+        output = output.decode("utf-8")
         f.close()
         results = output.split("\n")
         for result in results:
             if result != '':
+                print('result = ', result)
                 start1 = result.split()[0]
                 end1 = result.split()[1]
                 start2 = result.split()[2]
@@ -55,9 +61,9 @@ def self_align(seqs, read_length):
                 identity = result.split()[7]
                 length = int(result.split()[9])
                 if strand1 == strand2 and length > 0.4 * read_length and float(fractions.Fraction(identity)) > 0.95:
-                    if int(start1) < 5 and int(start2) > read_length and int(end1) < read_length and int(end2) > read_length*2 * 0.9: 
-                        print seq.id
-                        print result
+                    if int(start1) < 5 and int(start2) > read_length and int(end1) < read_length and int(end2) > read_length*2 * 0.9:
+                        print(seq.id)
+                        print(result)
                         if seq.id not in positive_self_aligns:
                             positive_self_aligns.append(seq.id)
     return positive_self_aligns
@@ -85,15 +91,15 @@ if __name__ == "__main__":
     if args.input:
         assembly = args.input
     else:
-        print "ERROR: No contig FASTA file was provided."
+        print("ERROR: No contig FASTA file was provided.")
         sys.exit()
 
 
     if args.read_length:
         read_length = int(args.read_length)
-           
+
     #Remove old temporary files if they exist.
-    print "Removing old temp files [Nope, I'm not -Matt]"
+    print("Removing old temp files [Nope, I'm not -Matt]")
     #os.system('rm ' + assembly + '.* > /dev/null 2>&1')
     #os.system('rm ' + assembly + '_* > /dev/null 2>&1')
 
@@ -102,13 +108,13 @@ if __name__ == "__main__":
     contigs_copy = contigs
 
     self_aligned = []
-    #check contigs for self-alignment overlap using lastz 
+    #check contigs for self-alignment overlap using lastz
     self_aligned = self_align(contigs, read_length)
-    
+
     paired_results = []
 
     #Write to file
-    print "Writing to files..."
+    print("Writing to files...")
     seqs = {}
     if len(self_aligned) > 0:
         for seq_r in contigs_copy:
@@ -119,12 +125,11 @@ if __name__ == "__main__":
             f.write(str(seqs[contig]) + "\n")
         f.close()
     else:
-        print "Error: No circular contigs were found."
+        print("Error: No circular contigs were found.")
         sys.exit(1)
     #Clean up
     #os.system('rm ' + assembly + '.* > /dev/null 2>&1')
     #os.system('rm ' + assembly + '_output* > /dev/null 2>&1')
     #os.system('rm ' + assembly + '_overlap* > /dev/null 2>&1')
-    print "Found " + str(len(self_aligned)) + " putative circular contigs."
-    print "Completed. Output stored in " + assembly.split("/")[-1] + '_circular.fna.'
-
+    print("Found " + str(len(self_aligned)) + " putative circular contigs.")
+    print("Completed. Output stored in " + assembly.split("/")[-1] + '_circular.fna.')
